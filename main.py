@@ -1,6 +1,7 @@
 from initialization import constants
 from initialization.helper_functions import HelperFunctions
 from logic.logic import LogicCreator
+from excel.report_parser import TxtParser
 
 
 class Main(object):
@@ -8,10 +9,12 @@ class Main(object):
     def __init__(self):
         self.helper = HelperFunctions()
         self.logic = LogicCreator()
+        self.parser = TxtParser()
 
     def run_project(self):
         self.logic.create_group_scores()
-        self.logic.create_result_table(constants.TEAMS[0][0], constants.TEAMS[0][1], constants.TEAMS[0][2], constants.TEAMS[0][3])
+        self.logic.compute_matches_second_stage()
+        #self.parser.parse_results(constants.GROUPS[0])
 
 
 

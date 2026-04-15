@@ -13,6 +13,8 @@ class LogicCreator(object):
         self.list_qualified_teams = []
         self.list_unqualified_teams = []
         self.text_location = os.path.join(os.getcwd(), "results", "text_files")
+        self.third_place_teams_dict = {}
+        self.third_place_teams =[]
 
     def create_group_scores(self):
         '''
@@ -30,7 +32,6 @@ class LogicCreator(object):
             # * will be used as a split
             match_string = constants.TEAMS[i][0] + "-" + constants.TEAMS[i][
                 1] + "*" + str(score_team1) + "-" + str(score_team2) + "\n"
-            print(match_string)
             if outcome == 1:
                 # start computing in dict
                 self.dictionary_teams_general[constants.TEAMS[i][0]][constants.ATTRIBUTES[0]] += 3
@@ -55,12 +56,11 @@ class LogicCreator(object):
                 self.dictionary_teams_general[constants.TEAMS[i][1]][constants.ATTRIBUTES[1]] += score_team2
                 self.dictionary_teams_general[constants.TEAMS[i][1]][constants.ATTRIBUTES[2]] += score_team1
             string_text_file += match_string
-            time.sleep(0.5)
+            #time.sleep(0.5)
             outcome, score_team1, score_team2 = self.helper.computize_group_scores()
             # * will be used as a split
             match_string = constants.TEAMS[i][2] + "-" + constants.TEAMS[i][
                 3] + "*" + str(score_team1) + "-" + str(score_team2) + "\n"
-            print(match_string)
             if outcome == 1:
                 # start computing in dict
                 self.dictionary_teams_general[constants.TEAMS[i][2]][constants.ATTRIBUTES[0]] += 3
@@ -85,7 +85,7 @@ class LogicCreator(object):
                 self.dictionary_teams_general[constants.TEAMS[i][3]][constants.ATTRIBUTES[1]] += score_team2
                 self.dictionary_teams_general[constants.TEAMS[i][3]][constants.ATTRIBUTES[2]] += score_team1
             string_text_file += match_string
-            time.sleep(0.5)
+            #time.sleep(0.5)
             '''
             ROUND 2
             '''
@@ -93,7 +93,6 @@ class LogicCreator(object):
             # * will be used as a split
             match_string = constants.TEAMS[i][1] + "-" + constants.TEAMS[i][
                 3] + "*" + str(score_team1) + "-" + str(score_team2) + "\n"
-            print(match_string)
             if outcome == 1:
                 # start computing in dict
                 self.dictionary_teams_general[constants.TEAMS[i][1]][constants.ATTRIBUTES[0]] += 3
@@ -118,12 +117,11 @@ class LogicCreator(object):
                 self.dictionary_teams_general[constants.TEAMS[i][3]][constants.ATTRIBUTES[1]] += score_team2
                 self.dictionary_teams_general[constants.TEAMS[i][3]][constants.ATTRIBUTES[2]] += score_team1
             string_text_file += match_string
-            time.sleep(0.5)
+            #time.sleep(0.5)
             outcome, score_team1, score_team2 = self.helper.computize_group_scores()
             # * will be used as a split
             match_string = constants.TEAMS[i][0] + "-" + constants.TEAMS[i][
                 2] + "*" + str(score_team1) + "-" + str(score_team2) + "\n"
-            print(match_string)
             if outcome == 1:
                 # start computing in dict
                 self.dictionary_teams_general[constants.TEAMS[i][0]][constants.ATTRIBUTES[0]] += 3
@@ -148,7 +146,7 @@ class LogicCreator(object):
                 self.dictionary_teams_general[constants.TEAMS[i][2]][constants.ATTRIBUTES[1]] += score_team2
                 self.dictionary_teams_general[constants.TEAMS[i][2]][constants.ATTRIBUTES[2]] += score_team1
             string_text_file += match_string
-            time.sleep(0.5)
+            #time.sleep(0.5)
             '''
             ROUND 3
             '''
@@ -156,7 +154,6 @@ class LogicCreator(object):
             # * will be used as a split
             match_string = constants.TEAMS[i][1] + "-" + constants.TEAMS[i][
                 2] + "*" + str(score_team1) + "-" + str(score_team2) + "\n"
-            print(match_string)
             if outcome == 1:
                 # start computing in dict
                 self.dictionary_teams_general[constants.TEAMS[i][1]][constants.ATTRIBUTES[0]] += 3
@@ -181,12 +178,11 @@ class LogicCreator(object):
                 self.dictionary_teams_general[constants.TEAMS[i][2]][constants.ATTRIBUTES[1]] += score_team2
                 self.dictionary_teams_general[constants.TEAMS[i][2]][constants.ATTRIBUTES[2]] += score_team1
             string_text_file += match_string
-            time.sleep(0.5)
+            #time.sleep(0.5)
             outcome, score_team1, score_team2 = self.helper.computize_group_scores()
             # * will be used as a split
             match_string = constants.TEAMS[i][0] + "-" + constants.TEAMS[i][
                 3] + "*" + str(score_team1) + "-" + str(score_team2) + "\n"
-            print(match_string)
             if outcome == 1:
                 # start computing in dict
                 self.dictionary_teams_general[constants.TEAMS[i][0]][constants.ATTRIBUTES[0]] += 3
@@ -211,7 +207,7 @@ class LogicCreator(object):
                 self.dictionary_teams_general[constants.TEAMS[i][3]][constants.ATTRIBUTES[1]] += score_team2
                 self.dictionary_teams_general[constants.TEAMS[i][3]][constants.ATTRIBUTES[2]] += score_team1
             string_text_file += match_string
-            time.sleep(0.5)
+            #time.sleep(0.5)
             '''
             ADD an extra line with some special characters to delimit when we write into excel between results and table data
             '''
@@ -224,18 +220,38 @@ class LogicCreator(object):
                     self.dictionary_teams_general[constants.TEAMS[i][j]][constants.ATTRIBUTES[1]] - \
                     self.dictionary_teams_general[constants.TEAMS[i][j]][constants.ATTRIBUTES[2]]
             # appeal result_table
-            table_result = self.create_result_table(constants.TEAMS[i][0], constants.TEAMS[i][1], constants.TEAMS[i][2], constants.TEAMS[i][3])
+            table_result, teams_ranking = self.create_result_table(constants.TEAMS[i][0], constants.TEAMS[i][1], constants.TEAMS[i][2], constants.TEAMS[i][3])
+
+            #add in the special dictionary all place 3 teams
+            dict_place_3 = self.dictionary_teams_general[teams_ranking[2]]
+            self.third_place_teams_dict.update({teams_ranking[2]:dict_place_3})
+
             '''START COMPUTING INTO FILE'''
             with open(file=os.path.join(self.text_location, constants.GROUPS[i]), mode="w",
                       encoding="utf-8") as result_group:
                 result_group.write(string_text_file)
                 result_group.write(table_result)
+            self.list_qualified_teams.append(teams_ranking[0])
+            self.list_qualified_teams.append(teams_ranking[1])
         for key, dict_val in self.dictionary_teams_general.items():
             print(key, dict_val)
+        #we will just need the qualified teams
+
+        #print(self.list_qualified_teams)
+        print(self.third_place_teams_dict)
+
+    def compute_matches_second_stage(self):
+        '''
+        will compute the qualified teams from the groups and choose based on what group and rank it has if a rank 1 team plays with a rank 3 team or rank 2 team - for world cup source
+        :return:LIST OF QUALIFIED TEAMS TO THE LAST 32 AND UPDATE DICT GENERAL
+        '''
+        dict_team_rank = self.helper.create_team_rank_place(self.list_qualified_teams)
+        self.third_place_teams = self.arrange_dict_third_place_teams()
+        print(self.third_place_teams)
+        print(dict_team_rank)
 
     def create_result_table(self, team1, team2, team3, team4):
         '''
-
         :return:The function returns the results for every group. It returns a string that it will be computed at every group in the final part
         will just use a sorting method and create some dicts which are then actually ordered
         '''
@@ -267,5 +283,14 @@ class LogicCreator(object):
                               str(list_items[idx][3]) + "." + str(list_items[idx][4]) +"\n"
                 string_sorted += string_line
             counter += 1
-        return string_sorted
+        return string_sorted, sorted_dict
+
+    def arrange_dict_third_place_teams(self):
+        teams = list(self.third_place_teams_dict.keys())
+        sorted_dict = sorted(teams, key= lambda team : (self.dictionary_teams_general[team][constants.ATTRIBUTES[0]],
+                                                                             self.dictionary_teams_general[team][constants.ATTRIBUTES[3]],
+                                                                             self.dictionary_teams_general[team][constants.ATTRIBUTES[1]]), reverse=True)
+        return sorted_dict[:8]
+
+
 

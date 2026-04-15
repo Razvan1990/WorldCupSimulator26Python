@@ -41,3 +41,5 @@ PLAYERS = [
 ]
 
 SPECIAL_CHARS_DELIMITERS = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+
+EXCEL_HEADERS1 =["MATCH", "SCORE", "STANDINGS"]

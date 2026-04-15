@@ -52,5 +52,20 @@ class HelperFunctions(object):
         else:
             return 3, score_match1, score_match2
 
-    def order_desc_scores(self, points1, points2, points3, points4):
-        pass
+    def create_team_rank_place(self, list_qualified_teams: list[str]) -> dict[str, str]:
+        string_groups = "ABCDEFGHIJKL"
+        dict_team_rank = dict()
+        group_count= 0
+        for i in range (0, len(list_qualified_teams), 2):
+            count = 1
+            key1 = str(count)+string_groups[group_count]
+            key2 = str(count+1)+string_groups[group_count]
+            dict_team_rank.update({key1: list_qualified_teams[i]})
+            dict_team_rank.update({key2: list_qualified_teams[i+1]})
+            group_count += 1
+        return dict_team_rank
+
+    def choose_random_third_place_team(self, list_third_place_teams: list[str]) -> int:
+        return random.randint(0, len(list_third_place_teams)-1)
+
+
