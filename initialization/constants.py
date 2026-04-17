@@ -6,6 +6,7 @@ ATTRIBUTES = ["Points", "Goals Scored", "Goals Conceived", "Difference"]
 
 GROUPS = ["GROUP_A", "GROUP_B", "GROUP_C", "GROUP_D", "GROUP_E", "GROUP_F", "GROUP_G", "GROUP_H", "GROUP_I", "GROUP_J",
           "GROUP_K", "GROUP_L"]
+KNOCKOUTS = ["LAST_32", "LAST_16", "QUARTER-FINALS", "SEMIFINALS", "SMALL FINAL", "BIG FINAL"]
 
 TEAMS = [
     ["Mexic", "South Africa", "South Korea", "Czech Republic"],

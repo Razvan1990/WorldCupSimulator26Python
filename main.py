@@ -13,8 +13,11 @@ class Main(object):
 
     def run_project(self):
         self.logic.create_group_scores()
+        self.logic.delete_points()
         self.logic.compute_matches_second_stage()
-        #self.parser.parse_results(constants.GROUPS[0])
+        #self.parser.parse_results_stages(constants.GROUPS[0])
+        #self.parser.parse_results_knockouts(constants.KNOCKOUTS[0])
+        self.logic.compute_final_stage_matches()
 
 
 

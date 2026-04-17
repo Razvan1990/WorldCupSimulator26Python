@@ -9,7 +9,7 @@ class TxtParser(object):
         self.logic = LogicCreator()
         self.change_list_flag = False
 
-    def parse_results(self, text_file):
+    def parse_results_stages(self, text_file):
         with open(file=os.path.join(self.logic.text_location, text_file), mode="r", encoding="utf-8") as f:
             list_needed_1 = []
             list_needed_2 = []
@@ -69,5 +69,50 @@ class TxtParser(object):
             list_needed_2.append(goals_scored)
             list_needed_2.append(goals_received)
             list_needed_2.append(difference_goals)
-
+            print(list_needed_1)
+            print(list_needed_2)
             return list_needed_1, list_needed_2
+
+    def parse_results_knockouts(self, text_file):
+        with open(file=os.path.join(self.logic.text_location, text_file), mode="r", encoding="utf-8") as f:
+            #reset back to false
+            self.change_list_flag = False
+            lines = f.readlines()
+            lines.remove(lines[len(lines)-1])
+            #split when we have delimiter characters
+            part1_list =[]
+            part2_list =[]
+
+            for i in range(1, len(lines)):
+                if lines[i] == constants.SPECIAL_CHARS_DELIMITERS:
+                    self.change_list_flag = True
+                    continue
+                if self.change_list_flag:
+                    part2_list.append(lines[i][:-1])
+                else:
+                    part1_list.append(lines[i][:-1])
+
+            first_list =[]
+
+            list_matches = []
+            list_scores = []
+            penalties = []
+            for result in part1_list:
+                match = result.split("*")[0]
+                score = result.split("*")[1]
+                penalty = result.split("*")[2]
+                list_matches.append(match)
+                list_scores.append(score)
+                penalties.append(penalty)
+            first_list.append(list_matches)
+            first_list.append(list_scores)
+            first_list.append(penalties)
+            print(first_list)
+            print(part2_list)
+            return first_list, part2_list
+
+
+
+
+
+
