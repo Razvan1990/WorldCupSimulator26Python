@@ -14,6 +14,9 @@ class LogicCreator(object):
         self.text_location = os.path.join(os.getcwd(), "results", "text_files")
         self.third_place_teams_dict = {}
         self.third_place_teams = []
+        self.counter_letters = "ABCDEFGHIJKLMNOPRS"
+        self.counter_files_generation = 0
+        self.goals_players =[]
 
     def create_group_scores(self):
         '''
@@ -23,7 +26,6 @@ class LogicCreator(object):
         '''
         for i in range(0, len(constants.TEAMS)):
             string_text_file = ""
-            string_text_file += constants.GROUPS[i] + "\n"
             '''
             ROUND 1
             '''
@@ -226,19 +228,24 @@ class LogicCreator(object):
             dict_place_3 = self.dictionary_teams_general[teams_ranking[2]]
             self.third_place_teams_dict.update({teams_ranking[2]: dict_place_3})
 
+            file_name = self.counter_letters[self.counter_files_generation] + constants.GROUPS[i]
             '''START COMPUTING INTO FILE'''
-            with open(file=os.path.join(self.text_location, constants.GROUPS[i]), mode="w",
+            with open(file=os.path.join(self.text_location,file_name), mode="w",
                       encoding="utf-8") as result_group:
                 result_group.write(string_text_file)
                 result_group.write(table_result)
             self.list_qualified_teams.append(teams_ranking[0])
             self.list_qualified_teams.append(teams_ranking[1])
+            self.counter_files_generation += 1
         for key, dict_val in self.dictionary_teams_general.items():
             print(key, dict_val)
         # we will just need the qualified teams
         self.third_place_teams = self.arrange_dict_third_place_teams()
+        print("Third place teams", self.third_place_teams)
+        third_place_teams_group = self.arrange_dict_third_place_teams()
         # print(self.list_qualified_teams)
         print(self.third_place_teams_dict)
+        return third_place_teams_group
 
     def delete_points(self):
         # remove from dict the points part
@@ -305,15 +312,15 @@ class LogicCreator(object):
         computed_last_32_string_results += match_string8
         winners.append(winner8)
 
-        #add the delimiter to delimit for excel
+        # add the delimiter to delimit for excel
         computed_last_32_string_results += constants.SPECIAL_CHARS_DELIMITERS
 
-        #make initial check to see if self.list_qualified contains all values of winner
+        # make initial check to see if self.list_qualified contains all values of winner
         check = self.helper.check_lists(self.list_qualified_teams, winners)
         if not check:
             raise Exception("Elements are not the same!!!")
         else:
-            #clear list and make the self.qualified list = winners to keep correct tracking
+            # clear list and make the self.qualified list = winners to keep correct tracking
             print(self.list_qualified_teams)
             self.list_qualified_teams.clear()
             self.list_qualified_teams = winners
@@ -322,31 +329,94 @@ class LogicCreator(object):
         '''
         ADD TO FILE
         '''
-        with open (file = os.path.join(self.text_location, constants.KNOCKOUTS[0]), mode ="w", encoding="utf-8") as f:
+        file_name = self.counter_letters[self.counter_files_generation] + constants.KNOCKOUTS[0]
+        self.counter_files_generation +=1
+        with open(file=os.path.join(self.text_location,file_name), mode="w", encoding="utf-8") as f:
             f.write(computed_last_32_string_results)
             f.write(string_winners)
 
     def compute_final_stage_matches(self):
-        #LAST_16
-        last_16_matches, list_unq = self.compute_knockout_matches(constants.KNOCKOUTS[1], self.list_qualified_teams)
+        '''
+        LAST16
+        '''
+        last_16_matches, _ = self.compute_knockout_matches(constants.KNOCKOUTS[1], self.list_qualified_teams)
         last_16_matches += constants.SPECIAL_CHARS_DELIMITERS
         print(last_16_matches)
         print(self.dictionary_teams_general)
         print(self.list_qualified_teams)
         string_winners = self.helper.compute_string_winners(self.list_qualified_teams)
-        '''
-        ADD TO FILE
-        '''
-        with open(file=os.path.join(self.text_location, constants.KNOCKOUTS[1]), mode="w", encoding="utf-8") as f:
+        # ADD TO FILE
+        file_name =  self.counter_letters[self.counter_files_generation] + constants.KNOCKOUTS[1]
+        self.counter_files_generation += 1
+        with open(file=os.path.join(self.text_location,file_name), mode="w", encoding="utf-8") as f:
             f.write(last_16_matches)
             f.write(string_winners)
+        '''
+        QUARTERFINALS
+        '''
+        quarterfinal_matches, _ = self.compute_knockout_matches(constants.KNOCKOUTS[2], self.list_qualified_teams)
+        quarterfinal_matches += constants.SPECIAL_CHARS_DELIMITERS
+        print(last_16_matches)
+        print(self.dictionary_teams_general)
+        print(self.list_qualified_teams)
+        string_winners = self.helper.compute_string_winners(self.list_qualified_teams)
+        # ADD TO FILE
+        file_name =  self.counter_letters[self.counter_files_generation] + constants.KNOCKOUTS[2]
+        self.counter_files_generation += 1
+        with open(file=os.path.join(self.text_location,file_name), mode="w", encoding="utf-8") as f:
+            f.write(quarterfinal_matches)
+            f.write(string_winners)
+        '''
+        SEMIFINALS
+        '''
+        semifinal_matches, list_unq = self.compute_knockout_matches(constants.KNOCKOUTS[3], self.list_qualified_teams)
+        semifinal_matches += constants.SPECIAL_CHARS_DELIMITERS
+        print(list_unq)
+        string_winners = self.helper.compute_string_winners(self.list_qualified_teams)
+        string_losers = self.helper.compute_string_winners(list_unq)
+        # ADD TO FILE
+        file_name =  self.counter_letters[self.counter_files_generation] + constants.KNOCKOUTS[3]
+        self.counter_files_generation += 1
+        with open(file=os.path.join(self.text_location, file_name), mode="w", encoding="utf-8") as f:
+            f.write(semifinal_matches)
+            f.write(string_winners)
+            f.write("\n" + constants.SPECIAL_CHARS_DELIMITERS)
+            f.write(string_losers)
 
+        '''
+        SMALL FINAL
+        '''
+        small_final_match, _ = self.compute_knockout_matches(constants.KNOCKOUTS[4], list_unq)
+        small_final_match += constants.SPECIAL_CHARS_DELIMITERS
+        string_winner = self.helper.compute_string_winners(list_unq)
+        print(self.dictionary_teams_general)
+        # ADD TO FILE
+        file_name =  self.counter_letters[self.counter_files_generation] + constants.KNOCKOUTS[4]
+        self.counter_files_generation += 1
+        with open(file=os.path.join(self.text_location, file_name), mode="w", encoding="utf-8") as f:
+            f.write(small_final_match)
+            f.write(string_winner)
 
+        '''
+        BIG FINAL
+        '''
+        big_final_match, _ = self.compute_knockout_matches(constants.KNOCKOUTS[5], self.list_qualified_teams)
+        big_final_match += constants.SPECIAL_CHARS_DELIMITERS
+        string_winner = self.helper.compute_string_winners(self.list_qualified_teams)
+        print(self.dictionary_teams_general)
+        #world cup winner
+        print("WORLD CUP 2026 WINNER IS ..." +string_winner)
+        # ADD TO FILE
+        file_name =  self.counter_letters[self.counter_files_generation] + constants.KNOCKOUTS[5]
+        self.counter_files_generation += 1
+        with open(file=os.path.join(self.text_location, file_name), mode="w", encoding="utf-8") as f:
+            f.write(big_final_match)
+            f.write(string_winner)
 
 
     def compute_second_stage_match_first_vs_third(self, dictionary_index_value, dict_team_rank, index_addition):
         match_string = ""
-        winner =""
+        winner = ""
         outcome, score_team1, score_team2 = self.helper.computize_scores()
         random_generated_team_third = self.third_place_teams[
             self.helper.choose_random_third_place_team(self.third_place_teams)]
@@ -379,6 +449,10 @@ class LogicCreator(object):
                 penalty2 = 4
             elif penalty1 > 4 and penalty2 == 1:
                 penalty1 = 4
+            elif penalty1 > 5 and penalty2 == 2:
+                penalty1 = 5
+            elif penalty2 > 5 and penalty2 == 2:
+                penalty2 = 5
 
             final_score_team1 = score_team1 + penalty1
             final_score_team2 = score_team2 + penalty2
@@ -402,11 +476,16 @@ class LogicCreator(object):
         self.dictionary_teams_general[dict_team_rank[dictionary_index_value]][constants.ATTRIBUTES[1]] += score_team1
         self.dictionary_teams_general[dict_team_rank[dictionary_index_value]][constants.ATTRIBUTES[2]] += score_team2
         self.dictionary_teams_general[dict_team_rank[dictionary_index_value]][
-            constants.ATTRIBUTES[3]] += score_team1 - score_team2
+            constants.ATTRIBUTES[3]] = self.dictionary_teams_general[dict_team_rank[dictionary_index_value]][
+                                           constants.ATTRIBUTES[1]] - \
+                                       self.dictionary_teams_general[dict_team_rank[dictionary_index_value]][
+                                           constants.ATTRIBUTES[2]]
 
         self.dictionary_teams_general[random_generated_team_third][constants.ATTRIBUTES[1]] += score_team2
         self.dictionary_teams_general[random_generated_team_third][constants.ATTRIBUTES[2]] += score_team1
-        self.dictionary_teams_general[random_generated_team_third][constants.ATTRIBUTES[3]] += score_team1 - score_team2
+        self.dictionary_teams_general[random_generated_team_third][constants.ATTRIBUTES[3]] = \
+            self.dictionary_teams_general[random_generated_team_third][constants.ATTRIBUTES[1]] - \
+            self.dictionary_teams_general[random_generated_team_third][constants.ATTRIBUTES[2]]
 
         return match_string, winner
 
@@ -423,7 +502,7 @@ class LogicCreator(object):
         :return: string with result of match to put in text_files
         '''
         match_string = ""
-        winner =""
+        winner = ""
         outcome, score_team1, score_team2 = self.helper.computize_scores()
         if outcome == 1:
             match_string = dict_team_rank[dictionary_index_value1] + "-" + dict_team_rank[
@@ -457,6 +536,10 @@ class LogicCreator(object):
                 penalty2 = 4
             elif penalty1 > 4 and penalty2 == 1:
                 penalty1 = 4
+            elif penalty1 > 5 and penalty2 == 2:
+                penalty1 = 5
+            elif penalty2 > 5 and penalty2 == 2:
+                penalty2 = 5
 
             final_score_team1 = score_team1 + penalty1
             final_score_team2 = score_team2 + penalty2
@@ -481,16 +564,21 @@ class LogicCreator(object):
                 self.helper.move_list_elements(self.list_qualified_teams, index_addition,
                                                self.list_qualified_teams.index(dict_team_rank[dictionary_index_value2]))
                 winner = dict_team_rank[dictionary_index_value2]
-        #update dictionary
+        # update dictionary
         self.dictionary_teams_general[dict_team_rank[dictionary_index_value1]][constants.ATTRIBUTES[1]] += score_team1
         self.dictionary_teams_general[dict_team_rank[dictionary_index_value1]][constants.ATTRIBUTES[2]] += score_team2
         self.dictionary_teams_general[dict_team_rank[dictionary_index_value1]][
-            constants.ATTRIBUTES[3]] += score_team1 - score_team2
-
+            constants.ATTRIBUTES[3]] = self.dictionary_teams_general[dict_team_rank[dictionary_index_value1]][
+                                           constants.ATTRIBUTES[1]] - \
+                                       self.dictionary_teams_general[dict_team_rank[dictionary_index_value1]][
+                                           constants.ATTRIBUTES[2]]
         self.dictionary_teams_general[dict_team_rank[dictionary_index_value2]][constants.ATTRIBUTES[1]] += score_team2
         self.dictionary_teams_general[dict_team_rank[dictionary_index_value2]][constants.ATTRIBUTES[2]] += score_team1
         self.dictionary_teams_general[dict_team_rank[dictionary_index_value2]][
-            constants.ATTRIBUTES[3]] += score_team1 - score_team2
+            constants.ATTRIBUTES[3]] = self.dictionary_teams_general[dict_team_rank[dictionary_index_value2]][
+                                           constants.ATTRIBUTES[1]] - \
+                                       self.dictionary_teams_general[dict_team_rank[dictionary_index_value2]][
+                                           constants.ATTRIBUTES[2]]
         return match_string, winner
 
     def compute_knockout_matches(self, stage_name, list_teams):
@@ -501,13 +589,13 @@ class LogicCreator(object):
         '''
         string_matches = ""
         list_unqualified_teams = []
-        for i in range (0, len(list_teams), 2):
+        for i in range(0, len(list_teams), 2):
             match_string = ""
             outcome, score_team1, score_team2 = self.helper.computize_scores()
             if outcome == 1:
-                match_string += list_teams[i] + "-" + list_teams[i+1] + "*" + str(
+                match_string += list_teams[i] + "-" + list_teams[i + 1] + "*" + str(
                     score_team1) + "-" + str(score_team2) + "*" + "\n"
-                list_unqualified_teams.append(list_teams[i+1])
+                list_unqualified_teams.append(list_teams[i + 1])
             elif outcome == 2:
                 match_string += list_teams[i] + "-" + list_teams[i + 1] + "*" + str(
                     score_team1) + "-" + str(score_team2) + "*" + "\n"
@@ -528,20 +616,24 @@ class LogicCreator(object):
                     penalty2 = 4
                 elif penalty1 > 4 and penalty2 == 1:
                     penalty1 = 4
+                elif penalty1 > 5 and penalty2 == 2:
+                    penalty1 = 5
+                elif penalty2 > 5 and penalty2 == 2:
+                    penalty2 = 5
 
                 final_score_team1 = score_team1 + penalty1
                 final_score_team2 = score_team2 + penalty2
 
                 # check winner
                 if final_score_team1 > final_score_team2:
-                    match_string += list_teams[i] + "-" +list_teams[i+1] + "*" + str(
-                        score_team1) + "-" + str(score_team2) + "*" +list_teams[i] + " won on penalties " + str(
+                    match_string += list_teams[i] + "-" + list_teams[i + 1] + "*" + str(
+                        score_team1) + "-" + str(score_team2) + "*" + list_teams[i] + " won on penalties " + str(
                         final_score_team1) + "-" + str(final_score_team2) + "\n"
-                    list_unqualified_teams.append(list_teams[i+1])
+                    list_unqualified_teams.append(list_teams[i + 1])
                 elif final_score_team1 < final_score_team2:
                     match_string += list_teams[i] + "-" + list_teams[i + 1] + "*" + str(
                         score_team1) + "-" + str(score_team2) + "*" + list_teams[
-                                       i] + " won on penalties " + str(
+                                        i + 1] + " won on penalties " + str(
                         final_score_team1) + "-" + str(final_score_team2) + "\n"
                     list_unqualified_teams.append(list_teams[i])
             self.dictionary_teams_general[list_teams[i]][
@@ -549,25 +641,26 @@ class LogicCreator(object):
             self.dictionary_teams_general[list_teams[i]][
                 constants.ATTRIBUTES[2]] += score_team2
             self.dictionary_teams_general[list_teams[i]][
-                constants.ATTRIBUTES[3]] += score_team1 - score_team2
+                constants.ATTRIBUTES[3]] = self.dictionary_teams_general[list_teams[i]][
+                                               constants.ATTRIBUTES[1]] - self.dictionary_teams_general[list_teams[i]][
+                                               constants.ATTRIBUTES[2]]
 
-            self.dictionary_teams_general[list_teams[i+1]][
-                constants.ATTRIBUTES[1]] += score_team1
-            self.dictionary_teams_general[list_teams[i+1]][
-                constants.ATTRIBUTES[2]] += score_team2
-            self.dictionary_teams_general[list_teams[i+1]][
-                constants.ATTRIBUTES[3]] += score_team1 - score_team2
+            self.dictionary_teams_general[list_teams[i + 1]][
+                constants.ATTRIBUTES[1]] += score_team2
+            self.dictionary_teams_general[list_teams[i + 1]][
+                constants.ATTRIBUTES[2]] += score_team1
+            self.dictionary_teams_general[list_teams[i + 1]][
+                constants.ATTRIBUTES[3]] = self.dictionary_teams_general[list_teams[i + 1]][
+                                               constants.ATTRIBUTES[1]] - \
+                                           self.dictionary_teams_general[list_teams[i + 1]][
+                                               constants.ATTRIBUTES[2]]
 
             string_matches += match_string
-        #update the qualified list
+        # update the qualified list
         self.helper.remove_unqualified_elements(list_teams, list_unqualified_teams)
-        if stage_name == constants.KNOCKOUTS[3]: #SEMIFINALS
+        if stage_name == constants.KNOCKOUTS[3]:  # SEMIFINALS
             return string_matches, list_unqualified_teams
-        return string_matches,None
-
-
-
-
+        return string_matches, None
 
     def create_result_table(self, team1, team2, team3, team4):
         '''
@@ -612,3 +705,22 @@ class LogicCreator(object):
                                                       self.dictionary_teams_general[team][constants.ATTRIBUTES[1]]),
                              reverse=True)
         return sorted_dict[:8]
+
+    def populate_player_goals(self):
+        for i in range (0, len(constants.TEAMS)):
+            for j in range (0, len(constants.TEAMS[i])):
+                list_temp = []
+                player = constants.PLAYERS[i][j]
+                team = constants.TEAMS[i][j]
+                goals_scored_team = self.dictionary_teams_general[team][constants.ATTRIBUTES[1]]
+                goals_scored_player = self.helper.generate_player_goals(goals_scored_team, 2)
+                list_temp.append(player)
+                list_temp.append(team)
+                list_temp.append(goals_scored_player)
+                self.goals_players.append(list_temp)
+        #sort the list based on goal numbers
+        self.goals_players.sort(key=lambda x: x[2], reverse=True)
+        print(self.goals_players)
+
+
+

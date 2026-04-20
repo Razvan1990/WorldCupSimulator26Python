@@ -95,4 +95,21 @@ class HelperFunctions(object):
         for element in list_unqualified_teams:
             list_qualified_teams.remove(element)
 
+    def check_third_place_team_is_qualified(self,team:str, list_third_place_teams: list[str]) -> bool:
+        return team in list_third_place_teams
+
+    def generate_player_goals(self, goals_scored_team:int, threshold) -> int:
+        '''
+
+        :param goals_scored_team:
+        :param threshold: it is a random threshold that can be modify based on your preferences
+        :return: number goals scored by a player
+        '''
+        if goals_scored_team - threshold < 2:
+            threshold = 0
+        player_goals = random.randint(0, goals_scored_team - threshold)
+        if player_goals < threshold:
+            return random.randint(0, threshold)
+        return player_goals
+
 

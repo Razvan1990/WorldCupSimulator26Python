@@ -7,9 +7,9 @@ class TxtParser(object):
 
     def __init__(self):
         self.logic = LogicCreator()
-        self.change_list_flag = False
 
     def parse_results_stages(self, text_file):
+        change_list_flag = False
         with open(file=os.path.join(self.logic.text_location, text_file), mode="r", encoding="utf-8") as f:
             list_needed_1 = []
             list_needed_2 = []
@@ -20,11 +20,11 @@ class TxtParser(object):
             First time we will see where we have the special character to delimit the lists
             '''
 
-            for i in range(1, len(lines)):
+            for i in range(0, len(lines)):
                 if lines[i] == constants.SPECIAL_CHARS_DELIMITERS:
-                    self.change_list_flag = True
+                    change_list_flag = True
                     continue
-                if self.change_list_flag:
+                if change_list_flag:
                     lines_second_part.append(lines[i][:-1])
                 else:
                     lines_first_part.append(lines[i][:-1])
@@ -76,18 +76,19 @@ class TxtParser(object):
     def parse_results_knockouts(self, text_file):
         with open(file=os.path.join(self.logic.text_location, text_file), mode="r", encoding="utf-8") as f:
             #reset back to false
-            self.change_list_flag = False
+            change_list_flag = False
             lines = f.readlines()
-            lines.remove(lines[len(lines)-1])
             #split when we have delimiter characters
             part1_list =[]
             part2_list =[]
 
-            for i in range(1, len(lines)):
+            for i in range(0, len(lines)):
                 if lines[i] == constants.SPECIAL_CHARS_DELIMITERS:
-                    self.change_list_flag = True
+                    change_list_flag = True
                     continue
-                if self.change_list_flag:
+                elif change_list_flag and i == len(lines) - 1:
+                    part2_list.append(lines[i])
+                elif change_list_flag:
                     part2_list.append(lines[i][:-1])
                 else:
                     part1_list.append(lines[i][:-1])
