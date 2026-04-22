@@ -14,9 +14,8 @@ class LogicCreator(object):
         self.text_location = os.path.join(os.getcwd(), "results", "text_files")
         self.third_place_teams_dict = {}
         self.third_place_teams = []
-        self.counter_letters = "ABCDEFGHIJKLMNOPRS"
+        self.counter_letters = "ABCDEFGHIJKLMNOPRSTU"
         self.counter_files_generation = 0
-        self.goals_players =[]
 
     def create_group_scores(self):
         '''
@@ -707,6 +706,7 @@ class LogicCreator(object):
         return sorted_dict[:8]
 
     def populate_player_goals(self):
+        goals_players = []
         for i in range (0, len(constants.TEAMS)):
             for j in range (0, len(constants.TEAMS[i])):
                 list_temp = []
@@ -717,10 +717,48 @@ class LogicCreator(object):
                 list_temp.append(player)
                 list_temp.append(team)
                 list_temp.append(goals_scored_player)
-                self.goals_players.append(list_temp)
+                goals_players.append(list_temp)
         #sort the list based on goal numbers
-        self.goals_players.sort(key=lambda x: x[2], reverse=True)
-        print(self.goals_players)
+        goals_players.sort(key=lambda x: x[2], reverse=True)
+        '''
+        ADD TO FILE
+        '''
+        string_goals = ""
+        for j in range (0, len(goals_players)):
+            string_temp =""
+            for i in range (0, len(goals_players[0])):
+                if i == len(goals_players[0]) - 1:
+                    string_temp += str(goals_players[j][i])
+                else:
+                    string_temp += str(goals_players[j][i]) +"*"
+            string_goals += string_temp +"\n"
+        filename = self.counter_letters[self.counter_files_generation] + constants.RANKING_FILES[1]
+        with open(file = os.path.join(self.text_location, filename), mode="w", encoding="utf-8") as text_file:
+            text_file.write(string_goals)
+
+
+    def create_file_final_rankings(self):
+        #sort in alphabetical order
+        sorted_dict = asc = {k: v for k, v in
+                             sorted(self.dictionary_teams_general.items(), key=lambda item: item[0])}
+        string_sorted_final_rankings = ""
+        for team in sorted_dict:
+            string_team_info = team+"*"+str(sorted_dict[team][constants.ATTRIBUTES[1]])+"*"+str(sorted_dict[team][constants.ATTRIBUTES[2]])+"*"+str(sorted_dict[team][constants.ATTRIBUTES[3]])+"\n"
+            string_sorted_final_rankings += string_team_info
+        '''
+        WRITE TO FILE
+        '''
+        filename = self.counter_letters[self.counter_files_generation]+constants.RANKING_FILES[0]
+        self.counter_files_generation +=1
+        with open (file = os.path.join(self.text_location, filename), mode='w', encoding="utf-8") as file:
+            file.write(string_sorted_final_rankings)
+
+
+
+
+
+
+
 
 
 

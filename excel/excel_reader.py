@@ -1,7 +1,6 @@
 import os.path
 
 import openpyxl
-import xlsxwriter
 from openpyxl.styles import Font, Alignment, PatternFill
 from openpyxl.utils import get_column_letter
 
@@ -17,7 +16,7 @@ class ExcelReader(object):
         self.excel_file = os.path.join(os.getcwd(), "results", "results.xlsx")
         self.text_file_paths = os.path.join(os.getcwd(), "results", "text_files")
         self.logic = LogicCreator()
-
+        self.counter_ranks = 1
 
     def create_excel_if_missing(self, path):
         if not os.path.exists(path):
@@ -181,23 +180,25 @@ class ExcelReader(object):
                                                    color='FF000000')
                     sheet_active["F1"].fill = PatternFill(fill_type="solid", fgColor="D9D9D9")
                     for j in range(0, len(qualified)):
-                        #add qualified in small final and big final
+                        # add qualified in small final and big final
                         if file[1:] == constants.KNOCKOUTS[len(constants.KNOCKOUTS) - 3]:
                             if j in [0, 1]:
                                 sheet_active["G{}".format(j + 2)].value = qualified[j]
                                 sheet_active["G{}".format(j + 2)].alignment = Alignment(horizontal="center")
-                                sheet_active["G{}".format(j + 2)].font = Font(name="Calibri", size=11, bold=True, italic=True,
+                                sheet_active["G{}".format(j + 2)].font = Font(name="Calibri", size=11, bold=True,
+                                                                              italic=True,
                                                                               color='FF000000')
-                                sheet_active["G{}".format(j + 2)].fill = PatternFill(fill_type="solid", fgColor="C6EFCE")
+                                sheet_active["G{}".format(j + 2)].fill = PatternFill(fill_type="solid",
+                                                                                     fgColor="C6EFCE")
                             else:
-                                #we put j as we are already at second index
+                                # we put j as we are already at second index
                                 sheet_active["F{}".format(j)].value = qualified[j]
                                 sheet_active["F{}".format(j)].alignment = Alignment(horizontal="center")
                                 sheet_active["F{}".format(j)].font = Font(name="Calibri", size=11, bold=True,
-                                                                              italic=True,
-                                                                              color='FF000000')
+                                                                          italic=True,
+                                                                          color='FF000000')
                                 sheet_active["F{}".format(j)].fill = PatternFill(fill_type="solid",
-                                                                                     fgColor="FF9999")
+                                                                                 fgColor="FF9999")
                         else:
                             sheet_active["F{}".format(j + 2)].value = qualified[j]
                             sheet_active["F{}".format(j + 2)].alignment = Alignment(horizontal="center")
@@ -210,6 +211,97 @@ class ExcelReader(object):
                     report_workbook.save(self.excel_file)
                 except:
                     print("Close excel or check error")
+
+    def create_sheet_final_rankings_sheet(self):
+        try:
+            file = os.listdir(self.text_file_paths)[len(os.listdir(self.text_file_paths)) - 2] #need to check here if we had more files
+            rankings = self.parser.parse_final_stats_file(os.path.join(self.text_file_paths, file))
+            report_workbook = openpyxl.load_workbook(self.excel_file)
+            # go to the last sheet
+            if not file[1:] in report_workbook.sheetnames:
+                report_workbook.create_sheet(file[1:])
+            sheet_active = report_workbook[file[1:]]
+            report_workbook.save(self.excel_file)
+            # remove all pattern fills
+            for row in sheet_active.iter_rows():
+                for cell in row:
+                    cell.fill = PatternFill()
+            needed_colummns = ["A", "B", "C", "D"]
+            for i in range(len(needed_colummns)):
+                sheet_active["{}1".format(needed_colummns[i])].value = constants.FINAL_RANKING_EXCEL_HEADERS[i]
+                # put formating
+                sheet_active["{}1".format(needed_colummns[i])].alignment = Alignment(horizontal="center", )
+                sheet_active["{}1".format(needed_colummns[i])].font = Font(name="Calibri", size=14, bold=True,
+                                                                           color='FF000000')
+                sheet_active["{}1".format(needed_colummns[i])].fill = PatternFill(fill_type="solid",
+                                                                                  fgColor="D9D9D9")
+            # populate list
+            counter_lists = 0
+            while counter_lists < len(rankings):
+                for i in range(len(needed_colummns)):
+                    sheet_active["{}{}".format(needed_colummns[i], counter_lists + 2)].value = rankings[counter_lists][
+                        i]
+                    sheet_active["{}{}".format(needed_colummns[i], counter_lists + 2)].alignment = Alignment(
+                        horizontal="center", )
+                    sheet_active["{}{}".format(needed_colummns[i], counter_lists + 2)].font = Font(name="Calibri",
+                                                                                                   size=11, bold=True, )
+                counter_lists += 1
+            # align everything
+            self.autofit_columns(sheet_active)
+            report_workbook.save(self.excel_file)
+
+        except:
+            raise Exception("Close excel or check error")
+
+    def create_sheet_strikers_list(self):
+        try:
+            file = os.listdir(self.text_file_paths)[len(os.listdir(self.text_file_paths)) - 1] #need to check here if we had more files
+            player_goals = self.parser.parse_goals_players_file(os.path.join(self.text_file_paths, file))
+            report_workbook = openpyxl.load_workbook(self.excel_file)
+            # go to the last sheet
+            if not file[1:] in report_workbook.sheetnames:
+                report_workbook.create_sheet(file[1:])
+            sheet_active = report_workbook[file[1:]]
+            report_workbook.save(self.excel_file)
+            # remove all pattern fills
+            for row in sheet_active.iter_rows():
+                for cell in row:
+                    cell.fill = PatternFill()
+
+            # create headers
+            needed_colummns = ["A", "B", "C", "D"]
+            for i in range(len(needed_colummns)):
+                sheet_active["{}1".format(needed_colummns[i])].value = constants.PLAYER_HEADERS[i]
+                # put formating
+                sheet_active["{}1".format(needed_colummns[i])].alignment = Alignment(horizontal="center", )
+                sheet_active["{}1".format(needed_colummns[i])].font = Font(name="Calibri", size=14, bold=True,
+                                                                           color='FF000000')
+                sheet_active["{}1".format(needed_colummns[i])].fill = PatternFill(fill_type="solid",
+                                                                                  fgColor="D9D9D9")
+            # start populating the list
+            counter_lists = 0
+            while counter_lists < len(player_goals):
+                for i in range(len(needed_colummns)):
+                    if counter_lists in [0, 1, 2]:
+                        sheet_active["{}{}".format(needed_colummns[i], counter_lists + 2)].fill = PatternFill(
+                            fill_type="solid",fgColor="C6EFCE")
+                    if needed_colummns[i] =="A":
+                        sheet_active["{}{}".format(needed_colummns[i], counter_lists + 2)].value = str(self.counter_ranks)
+                        self.counter_ranks += 1
+                    else:
+                        sheet_active["{}{}".format(needed_colummns[i], counter_lists + 2)].value = player_goals[counter_lists][i-1] #we will not have index out of range because here starts from index 2
+                    # put formating
+                    sheet_active["{}1".format(needed_colummns[i])].alignment = Alignment(horizontal="center", )
+                    sheet_active["{}1".format(needed_colummns[i])].font = Font(name="Calibri", size=14, bold=True,
+                                                                               color='FF000000')
+                counter_lists += 1
+                # align everything
+            self.autofit_columns(sheet_active)
+            report_workbook.save(self.excel_file)
+
+        except:
+            raise Exception("Close excel or check error")
+
 
     '''
     COPILOT CODE
@@ -230,5 +322,5 @@ class ExcelReader(object):
                     pass
 
             # Add a little padding
-            adjusted_width = max_length + 2
+            adjusted_width = max_length
             ws.column_dimensions[column_letter].width = adjusted_width

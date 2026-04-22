@@ -112,6 +112,40 @@ class TxtParser(object):
             print(part2_list)
             return first_list, part2_list
 
+    def parse_final_stats_file(self, text_file):
+        with open(file=os.path.join(self.logic.text_location, text_file), mode="r", encoding="utf-8") as f:
+            lines = f.readlines()
+            list_rankings = []
+
+            for line in lines:
+                temp_list = []
+                team = line.split("*")[0]
+                goals_scored = line.split("*")[1]
+                goals_received = line.split("*")[2]
+                difference_goals = line.split("*")[3][:-1]
+                temp_list.append(team)
+                temp_list.append(goals_scored)
+                temp_list.append(goals_received)
+                temp_list.append(difference_goals)
+                list_rankings.append(temp_list)
+            return list_rankings
+
+    def parse_goals_players_file(self, text_file):
+        with open(file=os.path.join(self.logic.text_location, text_file), mode="r", encoding="utf-8") as f:
+            lines = f.readlines()
+            list_players = []
+            for line in lines:
+                temp_list = []
+                player = line.split("*")[0]
+                team = line.split("*")[1]
+                goals_scored = line.split("*")[2][:-1]
+                temp_list.append(player)
+                temp_list.append(team)
+                temp_list.append(goals_scored)
+                list_players.append(temp_list)
+            return list_players
+
+
 
 
 
