@@ -69,8 +69,6 @@ class TxtParser(object):
             list_needed_2.append(goals_scored)
             list_needed_2.append(goals_received)
             list_needed_2.append(difference_goals)
-            print(list_needed_1)
-            print(list_needed_2)
             return list_needed_1, list_needed_2
 
     def parse_results_knockouts(self, text_file):
@@ -108,8 +106,6 @@ class TxtParser(object):
             first_list.append(list_matches)
             first_list.append(list_scores)
             first_list.append(penalties)
-            print(first_list)
-            print(part2_list)
             return first_list, part2_list
 
     def parse_final_stats_file(self, text_file):

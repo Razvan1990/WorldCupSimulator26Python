@@ -236,14 +236,9 @@ class LogicCreator(object):
             self.list_qualified_teams.append(teams_ranking[0])
             self.list_qualified_teams.append(teams_ranking[1])
             self.counter_files_generation += 1
-        for key, dict_val in self.dictionary_teams_general.items():
-            print(key, dict_val)
         # we will just need the qualified teams
         self.third_place_teams = self.arrange_dict_third_place_teams()
-        print("Third place teams", self.third_place_teams)
         third_place_teams_group = self.arrange_dict_third_place_teams()
-        # print(self.list_qualified_teams)
-        print(self.third_place_teams_dict)
         return third_place_teams_group
 
     def delete_points(self):
@@ -320,10 +315,8 @@ class LogicCreator(object):
             raise Exception("Elements are not the same!!!")
         else:
             # clear list and make the self.qualified list = winners to keep correct tracking
-            print(self.list_qualified_teams)
             self.list_qualified_teams.clear()
             self.list_qualified_teams = winners
-        print(self.dictionary_teams_general)
         string_winners = self.helper.compute_string_winners(self.list_qualified_teams)
         '''
         ADD TO FILE
@@ -340,9 +333,6 @@ class LogicCreator(object):
         '''
         last_16_matches, _ = self.compute_knockout_matches(constants.KNOCKOUTS[1], self.list_qualified_teams)
         last_16_matches += constants.SPECIAL_CHARS_DELIMITERS
-        print(last_16_matches)
-        print(self.dictionary_teams_general)
-        print(self.list_qualified_teams)
         string_winners = self.helper.compute_string_winners(self.list_qualified_teams)
         # ADD TO FILE
         file_name =  self.counter_letters[self.counter_files_generation] + constants.KNOCKOUTS[1]
@@ -355,9 +345,6 @@ class LogicCreator(object):
         '''
         quarterfinal_matches, _ = self.compute_knockout_matches(constants.KNOCKOUTS[2], self.list_qualified_teams)
         quarterfinal_matches += constants.SPECIAL_CHARS_DELIMITERS
-        print(last_16_matches)
-        print(self.dictionary_teams_general)
-        print(self.list_qualified_teams)
         string_winners = self.helper.compute_string_winners(self.list_qualified_teams)
         # ADD TO FILE
         file_name =  self.counter_letters[self.counter_files_generation] + constants.KNOCKOUTS[2]
@@ -370,7 +357,6 @@ class LogicCreator(object):
         '''
         semifinal_matches, list_unq = self.compute_knockout_matches(constants.KNOCKOUTS[3], self.list_qualified_teams)
         semifinal_matches += constants.SPECIAL_CHARS_DELIMITERS
-        print(list_unq)
         string_winners = self.helper.compute_string_winners(self.list_qualified_teams)
         string_losers = self.helper.compute_string_winners(list_unq)
         # ADD TO FILE
@@ -388,7 +374,6 @@ class LogicCreator(object):
         small_final_match, _ = self.compute_knockout_matches(constants.KNOCKOUTS[4], list_unq)
         small_final_match += constants.SPECIAL_CHARS_DELIMITERS
         string_winner = self.helper.compute_string_winners(list_unq)
-        print(self.dictionary_teams_general)
         # ADD TO FILE
         file_name =  self.counter_letters[self.counter_files_generation] + constants.KNOCKOUTS[4]
         self.counter_files_generation += 1
@@ -402,7 +387,6 @@ class LogicCreator(object):
         big_final_match, _ = self.compute_knockout_matches(constants.KNOCKOUTS[5], self.list_qualified_teams)
         big_final_match += constants.SPECIAL_CHARS_DELIMITERS
         string_winner = self.helper.compute_string_winners(self.list_qualified_teams)
-        print(self.dictionary_teams_general)
         #world cup winner
         print("WORLD CUP 2026 WINNER IS ..." +string_winner)
         # ADD TO FILE
@@ -739,7 +723,7 @@ class LogicCreator(object):
 
     def create_file_final_rankings(self):
         #sort in alphabetical order
-        sorted_dict = asc = {k: v for k, v in
+        sorted_dict =  {k: v for k, v in
                              sorted(self.dictionary_teams_general.items(), key=lambda item: item[0])}
         string_sorted_final_rankings = ""
         for team in sorted_dict:

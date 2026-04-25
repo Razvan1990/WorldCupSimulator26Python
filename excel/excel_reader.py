@@ -25,7 +25,6 @@ class ExcelReader(object):
 
     def create_excel_stage_sheets(self, third_place_teams_group):
         list_files = os.listdir(self.text_file_paths)
-        print(list_files)
         for file in list_files:
             if file[1:] in constants.GROUPS:
                 try:
@@ -87,7 +86,6 @@ class ExcelReader(object):
                     # add date in standings table
                     row_start = 3
                     counter_list_value = 0
-                    print(third_place_teams_group)
                     for column in needed_columns:
                         for i in range(0, len(list_tables[0])):
                             sheet_active["{}{}".format(column, i + row_start)].value = list_tables[counter_list_value][
@@ -210,7 +208,7 @@ class ExcelReader(object):
                     self.autofit_columns(sheet_active)
                     report_workbook.save(self.excel_file)
                 except:
-                    print("Close excel or check error")
+                    raise Exception("Close excel or check error")
 
     def create_sheet_final_rankings_sheet(self):
         try:
@@ -302,12 +300,24 @@ class ExcelReader(object):
         except:
             raise Exception("Close excel or check error")
 
+    def delete_empty_sheet(self):
+        try:
+            report_workbook = openpyxl.load_workbook(self.excel_file)
+            empty_sheet_name = "Sheet"
+            sheets = report_workbook.sheetnames
+            for sheet in sheets:
+                if empty_sheet_name == sheet:
+                    report_workbook.remove(report_workbook[empty_sheet_name])
+            report_workbook.save(self.excel_file)
+        except:
+            raise Exception("Close excel or check error")
+
 
     '''
     COPILOT CODE
     '''
-
-    def autofit_columns(self, ws):
+    @staticmethod
+    def autofit_columns(ws):
         for col in ws.columns:
             max_length = 0
             column = col[0].column  # numeric index
@@ -318,8 +328,8 @@ class ExcelReader(object):
                     cell_value = str(cell.value)
                     if cell_value:
                         max_length = max(max_length + 1, len(cell_value))
-                except:
-                    pass
+                except EncodingWarning:
+                    print("Something not correctly done")
 
             # Add a little padding
             adjusted_width = max_length
