@@ -1,5 +1,6 @@
 import os
 import random
+from os import mkdir
 
 from initialization import constants
 from initialization.helper_functions import HelperFunctions
@@ -11,6 +12,8 @@ class LogicCreator(object):
         self.helper = HelperFunctions()
         self.dictionary_teams_general = self.helper.create_initial_team_dict()
         self.list_qualified_teams = []
+        if not os.path.exists(os.path.join(os.getcwd(), "results", "text_files")):
+            mkdir(os.path.join(os.getcwd(), "results", "text_files"))
         self.text_location = os.path.join(os.getcwd(), "results", "text_files")
         self.third_place_teams_dict = {}
         self.third_place_teams = []
